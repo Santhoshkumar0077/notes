@@ -54,6 +54,7 @@ export default function CreateNote() {
 						type="submit"
 						className="btn btn-success"
 						disabled={isLoading}
+						onClick={handleCreate}
 					>
 						{isLoading ? (
 							<span
@@ -68,13 +69,7 @@ export default function CreateNote() {
 				<div /> {/* spacer to balance layout */}
 			</div>
 
-			<form
-				className="w-100"
-				onSubmit={(e) => {
-					e.preventDefault();
-					handleCreate();
-				}}
-			>
+			<form className="w-100">
 				<div className="mb-3">
 					<label htmlFor="title" className="form-label">
 						Title

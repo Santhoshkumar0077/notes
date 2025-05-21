@@ -4,7 +4,7 @@ import {
 } from "../redux/api/noteApi";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useMeQuery } from "../redux/api/userApi";
+import { useMeQuery } from "../redux/api/userApi"
 import { toast } from "react-hot-toast";
 import { setUsername } from "../redux/slices/userSlice";
 import { useDispatch } from "react-redux";

@@ -19,9 +19,9 @@ export default function PrivateRoute({ children }) {
   if (shouldRedirect) return <Navigate to="/login" />;
 
   return (
-    <div className="text-center mt-5">
-      <div className="spinner-border text-primary" role="status" />
-      <div className="mt-2">Checking authentication...</div>
+    <div class="flex flex-col items-center justify-center h-screen space-y-4">
+      <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-lg text-gray-700">Please wait...</p>
     </div>
   );
 }

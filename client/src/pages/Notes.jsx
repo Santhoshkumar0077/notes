@@ -97,8 +97,13 @@ export default function Notes() {
 					{error.data?.message}
 				</div>
 			)}
+			{fetchedNotes && fetchedNotes?.notes?.length === 0 && (
+				<div className="bg-red-100 text-red-700 px-4 py-2 rounded-md mb-4">
+					Notes are not created yet.
+				</div>
+			)}
 
-			{fetchedNotes && fetchedNotes?.notes?.length > 0 ? (
+			{fetchedNotes && fetchedNotes?.notes?.length > 0 && (
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 					{fetchedNotes.notes.map((note) => (
 						<div
@@ -128,10 +133,6 @@ export default function Notes() {
 						</div>
 					))}
 				</div>
-			) : (
-				<div className="bg-yellow-50 text-yellow-800 px-4 py-3 rounded-md mt-4">
-					Notes are not created yet.
-				</div>
-			)}
+			) }
 		</div>)
 		}

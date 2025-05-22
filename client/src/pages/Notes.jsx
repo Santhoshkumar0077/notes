@@ -1,25 +1,21 @@
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { toast } from "react-hot-toast";
+import { FiLogOut } from "react-icons/fi";
+import { AiOutlinePlus } from "react-icons/ai";
 import {
 	useGetNoteAllQuery,
 	useDeleteNoteMutation,
 } from "../redux/api/noteApi";
-import { useLogoutMutation } from "../redux/api/userApi";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-hot-toast";
-import { useMeQuery } from "../redux/api/userApi";
+import { useLogoutMutation, useMeQuery } from "../redux/api/userApi";
 import { setUsername } from "../redux/slices/userSlice";
-import { useDispatch } from "react-redux";
 
 export default function Notes() {
 	const username = useSelector((state) => state.user.username);
-	const {
-		data: fetchedNotes,
-		isLoading,
-		isSuccess: fetchedNotesStatus,
-	} = useGetNoteAllQuery();
-	const [deleteNote, { data, isSuccess, isError, error }] =
-		useDeleteNoteMutation();
+	const { data: fetchedNotes, isLoading, isSuccess: fetchedNotesStatus } =
+		useGetNoteAllQuery();
+	const [deleteNote, { isError, error }] = useDeleteNoteMutation();
 	const [logout] = useLogoutMutation();
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -30,12 +26,14 @@ export default function Notes() {
 			dispatch(setUsername(getUserData.username));
 		}
 	}, [getUserData, dispatch]);
-	const handleNoteClick = async (note) => {
+
+	const handleNoteClick = (note) => {
 		navigate(`/notedetails/${note._id}`);
 	};
+
 	const handleNoteClickDelete = async (note) => {
 		const confirmDelete = window.confirm(
-			"Are you sure you want to delete this note?",
+			"Are you sure you want to delete this note?"
 		);
 		if (!confirmDelete) return;
 
@@ -47,6 +45,7 @@ export default function Notes() {
 			alert("Failed to delete note.");
 		}
 	};
+
 	const handelLogout = async () => {
 		try {
 			const res = await logout().unwrap();
@@ -58,78 +57,82 @@ export default function Notes() {
 			console.log(error.data?.message);
 		}
 	};
+
 	return (
-		<div className="container py-4">
-			<div className="d-flex justify-content-between align-items-center mb-4">
-				<h2 className="text-primary">My Notes</h2>
-				<button
-					className="btn btn-success"
-					onClick={() => navigate("/create")}
-				>
-					Create New +
-				</button>
-				<button className="btn btn-danger" onClick={handelLogout}>
-					Logout
-				</button>
+		<div className="max-w-7xl mx-auto px-4 py-6">
+			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+				<h2 className="text-2xl font-bold text-gray-800">My Notes</h2>
+				<div className="flex gap-2">
+					<button
+						className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow"
+						onClick={() => navigate("/create")}
+					>
+						<AiOutlinePlus size={20} />
+						Create New
+					</button>
+					<button
+						className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow"
+						onClick={handelLogout}
+					>
+						<FiLogOut size={20} />
+						Logout
+					</button>
+				</div>
 			</div>
 
 			{getUserLoading ? (
-				<div className="spinner-border text-secondary" role="status">
-					<span className="visually-hidden">Loading user...</span>
-				</div>
+				<div className="text-center text-gray-500">Loading user...</div>
 			) : (
-				<div className="alert alert-info">
+				<div className="bg-blue-50 text-blue-800 px-4 py-3 rounded-md mb-4">
 					Welcome, <strong>{username}</strong>
 				</div>
 			)}
 
 			{isLoading && (
-				<div className="spinner-border text-primary" role="status">
-					<span className="visually-hidden">Loading...</span>
-				</div>
+				<div className="text-center text-gray-500">Loading notes...</div>
 			)}
+
 			{isError && (
-				<div className="alert alert-danger">{error.data?.message}</div>
+				<div className="bg-red-100 text-red-700 px-4 py-2 rounded-md mb-4">
+					{error.data?.message}
+				</div>
 			)}
 
 			{fetchedNotesStatus && fetchedNotes?.notes?.length > 0 ? (
-				<div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-					{fetchedNotes.notes.map((note, index) => (
-						<div key={note._id} className="col">
-							<div
-								className="card h-100 shadow-sm"
-								onClick={() => handleNoteClick(note)}
-								style={{ cursor: "pointer" }}
-							>
-								<div className="card-body">
-									<h5 className="card-title">{note.title}</h5>
-									<p className="card-text">
-										{note.description.length > 30
-											? note.description.slice(0, 30) +
-												"..."
-											: note.description}
-									</p>
-								</div>
-								<div className="card-footer bg-white border-top-0">
-									<button
-										className="btn btn-outline-danger btn-sm"
-										onClick={(e) => {
-											e.stopPropagation(); // prevent card click
-											handleNoteClickDelete(note);
-										}}
-									>
-										Delete
-									</button>
-								</div>
+				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+					{fetchedNotes.notes.map((note) => (
+						<div
+							key={note._id}
+							className="bg-white shadow-md rounded-lg p-4 cursor-pointer transition hover:shadow-lg"
+							onClick={() => handleNoteClick(note)}
+						>
+							<h3 className="text-lg font-semibold text-gray-800 mb-2">
+								{note.title}
+							</h3>
+							<p className="text-gray-600 text-sm mb-4">
+								{note.description.length > 30
+									? `${note.description.slice(0, 30)}...`
+									: note.description}
+							</p>
+							<div className="text-right">
+								<button
+									className="text-red-600 hover:text-red-800 text-sm font-medium"
+									onClick={(e) => {
+										e.stopPropagation();
+										handleNoteClickDelete(note);
+									}}
+								>
+									Delete
+								</button>
 							</div>
 						</div>
 					))}
 				</div>
 			) : (
-				<div className="alert alert-warning mt-4">
+				<div className="bg-yellow-50 text-yellow-800 px-4 py-3 rounded-md mt-4">
 					Notes are not created yet.
 				</div>
 			)}
 		</div>
 	);
-}
+	

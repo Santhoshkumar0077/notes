@@ -4,17 +4,19 @@ import {
 } from "../redux/api/noteApi";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useMeQuery } from "../redux/api/userApi"
+import { useMeQuery } from "../redux/api/userApi";
 import { toast } from "react-hot-toast";
 import { setUsername } from "../redux/slices/userSlice";
 import { useDispatch } from "react-redux";
+import { FaArrowLeft, FaSave, FaTimes } from "react-icons/fa";
+
 export default function NoteDetails() {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const { data, isLoading, isError, error } = useGetNoteOneQuery(id);
 	const [noteData, setNoteData] = useState({ title: "", description: "" });
 	const dispatch = useDispatch();
-	const { data: getUserData, isLoading: getUserLoading } = useMeQuery();
+	const { data: getUserData } = useMeQuery();
 
 	useEffect(() => {
 		if (getUserData) {
@@ -40,6 +42,7 @@ export default function NoteDetails() {
 			});
 		}
 	}, [data]);
+
 	if (isError) {
 		toast(error?.data?.message, { icon: "😒" });
 		return navigate("/");
@@ -52,24 +55,26 @@ export default function NoteDetails() {
 			[name]: value,
 		}));
 	};
+
 	const handleUpdate = async () => {
 		const res = await update({ noteId: id, ...noteData }).unwrap();
 		toast.success(res.message);
 	};
 
 	return (
-		<div className="container py-4">
-			<div className="d-flex justify-content-between align-items-center mb-4">
+		<div className="max-w-4xl mx-auto px-4 py-6">
+			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
 				<button
-					className="btn btn-link p-0"
+					className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold transition"
 					onClick={() => navigate("/")}
 				>
-					← Back
+					<FaArrowLeft />
+					<span>Back</span>
 				</button>
-				<h2 className="h4 text-secondary mb-0">Edit Note</h2>
-				<div className="d-flex justify-content-end">
+				<h2 className="text-2xl font-bold text-gray-800">Edit Note</h2>
+				<div className="flex gap-3">
 					<button
-						className="btn btn-secondary me-3"
+						className="flex items-center gap-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-4 py-2 rounded-lg transition"
 						onClick={(e) => {
 							e.preventDefault();
 							if (data) {
@@ -81,36 +86,39 @@ export default function NoteDetails() {
 							}
 						}}
 					>
-						Cancel
+						<FaTimes />
+						<span>Cancel</span>
 					</button>
 					<button
-						className="btn btn-primary"
+						className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition disabled:opacity-50"
 						disabled={updatedIsLoading}
 						onClick={handleUpdate}
 					>
 						{updatedIsLoading ? (
-							<span
-								className="spinner-border spinner-border-sm"
-								role="status"
-							/>
+							<span className="animate-spin h-5 w-5 border-t-2 border-white rounded-full"></span>
 						) : (
-							"Save Changes"
+							<>
+								<FaSave />
+								<span>Save</span>
+							</>
 						)}
 					</button>
 				</div>
-				<div />
 			</div>
 
-			<form className="w-100">
-				<div className="mb-3">
-					<label htmlFor="title" className="form-label">
+			<form className="space-y-6">
+				<div>
+					<label
+						htmlFor="title"
+						className="block text-gray-700 font-semibold mb-2"
+					>
 						Title
 					</label>
 					<input
 						id="title"
 						name="title"
 						type="text"
-						className="form-control"
+						className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
 						value={noteData.title}
 						onChange={handleChange}
 						placeholder="Enter note title"
@@ -118,44 +126,43 @@ export default function NoteDetails() {
 					/>
 				</div>
 
-				<div className="mb-3">
-					<label htmlFor="description" className="form-label">
+				<div>
+					<label
+						htmlFor="description"
+						className="block text-gray-700 font-semibold mb-2"
+					>
 						Description
 					</label>
 					<textarea
 						id="description"
 						name="description"
-						className="form-control py-2"
+						className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
 						value={noteData.description}
 						onChange={handleChange}
-						rows={18}
+						rows={15}
 						placeholder="Write your note here..."
 					/>
 				</div>
 
 				{updatedIsError && (
-					<div className="alert alert-danger mt-3">
-						{updatedError?.data?.message ||
-							"Failed to update note."}
+					<div className="text-red-600 bg-red-100 p-3 rounded-lg">
+						{updatedError?.data?.message || "Failed to update note."}
 					</div>
 				)}
 			</form>
 
 			{isLoading && (
-				<div className="text-center mt-5">
-					<div
-						className="spinner-border text-secondary"
-						role="status"
-					>
-						<span className="visually-hidden">Loading...</span>
-					</div>
+				<div className="text-center mt-10">
+					<div className="w-6 h-6 border-4 border-blue-400 border-dashed rounded-full animate-spin mx-auto"></div>
+					<p className="text-gray-500 mt-2">Loading note...</p>
 				</div>
 			)}
+
 			{isError && (
-				<div className="alert alert-warning mt-4">
+				<div className="text-yellow-700 bg-yellow-100 mt-6 p-3 rounded-lg">
 					{error?.data?.message || "Could not fetch note details."}
 				</div>
 			)}
 		</div>
 	);
-}
+						

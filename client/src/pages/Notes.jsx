@@ -97,6 +97,7 @@ export default function Notes() {
 					{error.data?.message}
 				</div>
 			)}
+
 			{fetchedNotes && fetchedNotes?.notes?.length === 0 && (
 				<div className="bg-red-100 text-red-700 px-4 py-2 rounded-md mb-4">
 					Notes are not created yet.
@@ -133,6 +134,7 @@ export default function Notes() {
 						</div>
 					))}
 				</div>
-			) }
-		</div>)
-		}
+			)}
+		</div>
+	);
+			}			 

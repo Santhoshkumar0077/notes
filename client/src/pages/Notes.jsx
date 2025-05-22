@@ -1,4 +1,4 @@
-import { useSelector, useDispatch } from "react-redux";
+noimport { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
@@ -134,5 +134,4 @@ export default function Notes() {
 				</div>
 			)}
 		</div>
-	);
-	
+		}
